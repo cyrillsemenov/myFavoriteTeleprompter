@@ -45,15 +45,15 @@ window.onload = () => {
     // };
 
     $("input[type=range]").on("input change", function() {
+        console.log("OUTPUT <<<", this.id, $(this).val());
         if (!block) {
-            console.log("OUTPUT <<<", this.id, $(this).val());
             socket.emit("sync", this.id, $(this).val());
-            switch (this.id) {
-                case "size":
-                    $("#container").css("font-size", $(this).val()+"vw");
-                case "margin":
-                    $("#container").css("margin-right", $(this).val()+"vw").css("margin-left", $(this).val()+"vw");
-            };
+        };
+        switch (this.id) {
+            case "size":
+                $("#container").css("font-size", $(this).val()+"vw");
+            case "margin":
+                $("#container").css("margin-right", $(this).val()+"vw").css("margin-left", $(this).val()+"vw");
         };
     });
 };
