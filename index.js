@@ -32,13 +32,13 @@ io.on("connection", (socket) => {
     socket.on("join", (id) => {
         socket.room = id;
         socket.join(id);
-        socket.broadcast.to(id).emit("joined", id);
+        socket.to(id).emit("joined", id);
     });
 
     socket.on("sync", (command, value) => {
         // console.log("MESSAGEFROM", socket.id);
         // console.log(socket.id, ">>>", command, value);
-        socket.broadcast.to(socket.room).emit("sync", command, value);
+        socket.to(socket.room).emit("sync", command, value);
     });
 
     socket.on("print", value => {
