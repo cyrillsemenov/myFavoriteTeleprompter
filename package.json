@@ -1,0 +1,15 @@
+{
+  "name": "myfavouriteteleprompter",
+  "version": "1.0.0",
+  "description": "Simple yet beautiful teleprompter app using socket.io",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "afab",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^3.1.2"
+  }
+}

@@ -1,0 +1,121 @@
+@font-face {
+    font-family: 'JetBrains-Bold';
+    src:  url('webfonts/JetBrainsMono-Bold.woff2') format('woff2');
+}
+
+body {
+    -webkit-overflow-scrolling: auto;
+    scroll-behavior: auto;
+    -webkit-text-size-adjust: none;
+    margin: 0;
+    background-color: #000;
+}
+
+#container {
+    text-rendering: optimizeLegibility;
+    font-size: 10vw;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 50vw;
+    /* -webkit-font-feature-settings: "kern" 1; */
+    /* font-kerning: none; */
+    /* letter-spacing: 0vw; */
+    /* line-height: 10vw; */
+    margin-right: 10vw;
+    margin-left: 10vw;
+    padding-top: 100px;
+    color: #fff;
+    font-family: "JetBrains-Bold";
+}
+
+.control {
+    display: grid;
+    justify-content: space-between;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    height: 10%;
+    position: fixed;
+    top: 5px;
+    background-color: #1d1d1d6b;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#qr {
+    align-self: center;
+    justify-self: start;
+    padding-left: 3px;
+    filter: invert(1);
+}
+
+#qr>a>img{
+    cursor: none;
+    width: 50%;
+    transition: all .2s ease-in-out;
+}
+
+#qr>a>img:hover{
+    cursor: none;
+    width: 100%;
+}
+
+/*  !!!!  */
+/*  Flip  */
+/*  !!!!  */
+.flip {
+    transform:         scaleX(-1);
+    -moz-transform:    scaleX(-1);
+    -o-transform:      scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    filter: FlipH;
+}
+
+/* Progress bar */
+.progress-container {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    height: 5px;
+    background: #000;
+}
+
+.progress-bar {
+    height: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    width: 0%;
+}
+
+/* Arrows */
+.arrow {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+  }
+  
+  .right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+  }
+  
+  .left {
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+  }
+  
+  .up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+  }
+  
+  .down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+
+  img {
+    object-fit: contain;
+  }
