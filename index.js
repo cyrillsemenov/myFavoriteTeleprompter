@@ -41,6 +41,11 @@ http.listen(port, () => {
     console.log("Server listening at port %d", port);
 });
 
+http.on('clientError', (err, socket) => {
+    console.error(err);
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  });
+
 const throttle = (func, limit = process.env.LIMIT || 30) => {
     let inThrottle
     return function() {
