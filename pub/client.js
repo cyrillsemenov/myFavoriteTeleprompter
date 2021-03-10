@@ -87,16 +87,13 @@ function socketConnect() {
                     document.getElementById("container").scrollTop = setScroll(value);
                 break;
             case "input":
-                $(".container").html(value);
+                $("#container").html(value);
                 break;
             case "size":
             case "margin":
                 $("#"+command).val(value);
                 $("#"+command).trigger("change")
                 break;
-            case "viewport":
-                $('meta[name="viewport"]').attr("content", "width=320,user-scalable=no,initial-scale="+value/10);
-                console.log("<<<<VP =", value/10);
         };
         preventEvent();
     });
