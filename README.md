@@ -1,4 +1,4 @@
 # myFavoriteTeleprompter
 
 Todo:
-[ ] Write fckn README
+[] Write fckn README
