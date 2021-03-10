@@ -1,23 +1,29 @@
-// const fs = require("fs");
-// const options = {
-//     key: fs.readFileSync("key.pem"),
-//     cert: fs.readFileSync("cert.pem")
-// };
-const express = require("express");
-const app = express();
-const path = require("path");
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
-const port = process.env.PORT || 3000;
+const express = require('express');
+const socketIO = require('socket.io');
+const PORT = process.env.PORT || 3000;
+const INDEX = 'pub/index.html';
 
-app.use(express.static(path.join(__dirname, "pub")))
+const server = express()
+  .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+const io = socketIO(server);
+
+// const express = require("express");
+// const app = express();
+// const path = require("path");
+// const http = require("http").createServer(app);
+// const io = require("socket.io")(http);
+// const port = process.env.PORT || 3000;
+
+// app.use(express.static(path.join(__dirname, "pub")))
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "pub/index.html"));
+    res.sendFile(INDEX);
 });
 
 app.get("/:room", (req, res) => {
-    res.sendFile(path.join(__dirname, "pub/index.html"));
+    res.sendFile(INDEX);
 });
 
 io.on("connection", (socket) => {
@@ -37,14 +43,14 @@ io.on("connection", (socket) => {
     });
 });
 
-http.listen(port, () => {
-    console.log("Server listening at port %d", port);
-});
+// http.listen(port, () => {
+//     console.log("Server listening at port %d", port);
+// });
 
-http.on('clientError', (err, socket) => {
-    console.error(err);
-    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-  });
+// http.on('clientError', (err, socket) => {
+//     console.error(err);
+//     socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+//   });
 
 const throttle = (func, limit = process.env.LIMIT || 30) => {
     let inThrottle
