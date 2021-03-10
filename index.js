@@ -38,7 +38,7 @@ io.on("connection", (socket) => {
     socket.on("sync", (command, value) => {
         // console.log("MESSAGEFROM", socket.id);
         // console.log(socket.id, ">>>", command, value);
-        socket.broadcast.emit("sync", command, value);
+        socket.broadcast.to(socket.room).emit("sync", command, value);
     });
 
     socket.on("print", value => {
