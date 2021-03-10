@@ -1,10 +1,11 @@
+const path = require("path");
 const express = require('express');
 const socketIO = require('socket.io');
 const PORT = process.env.PORT || 3000;
 const INDEX = 'pub/index.html';
 
 const app = express();
-const server = app.use((req, res) => res.sendFile(INDEX, { root: __dirname }))
+const server = app.use(express.static(path.join(__dirname, "pub")))
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const io = socketIO(server);
@@ -19,11 +20,11 @@ const io = socketIO(server);
 // app.use(express.static(path.join(__dirname, "pub")))
 
 app.get("/", (req, res) => {
-    res.sendFile(INDEX);
+    res.sendFile(path.join(__dirname, INDEX));
 });
 
 app.get("/:room", (req, res) => {
-    res.sendFile(INDEX);
+    res.sendFile(path.join(__dirname, INDEX));
 });
 
 io.on("connection", (socket) => {
