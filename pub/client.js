@@ -28,11 +28,13 @@ window.onload = () => {
         if (!block) {
             console.log("OUTPUT <<<", "scroll", scrl);
             socket.emit("sync", "scroll", scrl);
-        }
+        };
     });
 
     $("#container").on("input", e => {
-        socket.emit("sync", "input", e.target.innerHTML);
+        if (!block) {
+            socket.emit("sync", "input", e.target.innerHTML);
+        };
     });
     // window.onscroll = e => {
     //     $("#bar").css("width", getScroll()*100 + "%");
@@ -43,15 +45,17 @@ window.onload = () => {
     // };
 
     $("input[type=range]").on("input change", function() {
-        console.log("OUTPUT <<<", this.id, $(this).val());
-        socket.emit("sync", this.id, $(this).val());
-        switch (this.id) {
-            case "size":
-                $("#container").css("font-size", $(this).val()+"vw");
-            case "margin":
-                $("#container").css("margin-right", $(this).val()+"vw").css("margin-left", $(this).val()+"vw");
-        }
-    })
+        if (!block) {
+            console.log("OUTPUT <<<", this.id, $(this).val());
+            socket.emit("sync", this.id, $(this).val());
+            switch (this.id) {
+                case "size":
+                    $("#container").css("font-size", $(this).val()+"vw");
+                case "margin":
+                    $("#container").css("margin-right", $(this).val()+"vw").css("margin-left", $(this).val()+"vw");
+            };
+        };
+    };)
 };
 
 function socketConnect() {
