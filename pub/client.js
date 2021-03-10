@@ -1,6 +1,6 @@
 const socket = io("/");
 const h = document.getElementById("container");
-const url = "https://192.168.1.207:3000/";
+const url = "https://mfpromptr.herokuapp.com/";
 var axis;
 var block = false;
 
