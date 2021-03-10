@@ -55,7 +55,7 @@ window.onload = () => {
                     $("#container").css("margin-right", $(this).val()+"vw").css("margin-left", $(this).val()+"vw");
             };
         };
-    };)
+    });
 };
 
 function socketConnect() {
@@ -73,7 +73,7 @@ function socketConnect() {
         console.log("joined", id);
     })
 
-    function preventScrollEvent() {
+    function preventEvent() {
         blocker = setTimeout(() => block = false, 300);
     }
 
@@ -98,7 +98,7 @@ function socketConnect() {
                 $('meta[name="viewport"]').attr("content", "width=320,user-scalable=no,initial-scale="+value/10);
                 console.log("<<<<VP =", value/10);
         };
-        preventScrollEvent();
+        preventEvent();
     });
 }
 
