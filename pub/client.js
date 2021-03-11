@@ -3,6 +3,10 @@ const h = document.getElementById("container");
 const url = "https://mfpromptr.herokuapp.com/";
 var axis;
 var block = false;
+const s = document.getElementById('size');
+const m = document.getElementById('margin');
+const lh = document.getElementById('lineHeight');
+const sp = document.getElementById('letterSpacing');
 
 window.onload = () => {
     $(document).on("gesturestart", (e) => { e.preventDefault();});
@@ -52,8 +56,16 @@ window.onload = () => {
         switch (this.id) {
             case "size":
                 $("#container").css("font-size", $(this).val()+"vw");
+                break;
             case "margin":
                 $("#container").css("margin-right", $(this).val()+"vw").css("margin-left", $(this).val()+"vw");
+                break;
+            case "lineHeight":
+                $("#container").css("line-height", $(this).val()/10 +"em");
+                break;
+            case "letterSpacing":
+                $("#container").css("letter-spacing", $(this).val()/100 +"em");
+                break;
         };
     });
 };
@@ -91,6 +103,8 @@ function socketConnect() {
                 break;
             case "size":
             case "margin":
+            case "lineHeight":
+            case "letterSpacing":
                 $("#"+command).val(value);
                 $("#"+command).trigger("change")
                 break;

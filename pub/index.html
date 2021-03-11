@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="normalize.css">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="normalize.css">
+    
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <title>My favourite teleprompter</title>
 </head>
@@ -16,16 +17,41 @@
     <div class="progress-container">
         <div class="progress-bar" id="bar"></div>
     </div>
-    <div class="control">
+    <div id="control" class="noselect">
         <div id="qr"></div>
-        <div>
-            <input type="range" id="size" min="3" max="20">
-            <input type="range" id="margin" min="0" max="20">
+        <div class="control-elem">
+            <h3>Text size</h3>
+            <div class="arrow-cnt" onclick="s.value = parseInt(s.value) - 1; s.dispatchEvent(new Event('input'))"><div class="arrow left"></div></div>
+            <input type="range" id="size" min="3" max="20" oninput="this.nextElementSibling.value = this.value > 9 ? this.value : '0' + this.value">
+            <output>0</output>
+            <div class="arrow-cnt" onclick="s.value = parseInt(s.value) + 1; s.dispatchEvent(new Event('input'))"><div class="arrow right"></div></div>
+        </div>
+        <div class="control-elem">
+            <h3>Margins</h3>
+            <div class="arrow-cnt" onclick="m.value = parseInt(m.value) - 1; m.dispatchEvent(new Event('input'))"><div class="arrow left"></div></div>
+            <input type="range" id="margin" min="0" max="20" oninput="this.nextElementSibling.value = this.value > 9 ? this.value : '0' + this.value">
+            <output>0</output>
+            <div class="arrow-cnt" onclick="m.value = parseInt(m.value) + 1; m.dispatchEvent(new Event('input'))"><div class="arrow right"></div></div>
+        </div>
+        <div class="control-elem">
+            <h3>Line height</h3>
+            <div class="arrow-cnt" onclick="lh.value = parseInt(lh.value) - 1; lh.dispatchEvent(new Event('input'))"><div class="arrow left"></div></div>
+            <input type="range" id="lineHeight" min="8" max="15" oninput="this.nextElementSibling.value = this.value > 9 ? this.value : '0' + this.value">
+            <output>0</output>
+            <div class="arrow-cnt" onclick="lh.value = parseInt(lh.value) + 1; lh.dispatchEvent(new Event('input'))"><div class="arrow right"></div></div>
+        </div>
+        <div class="control-elem">
+            <h3>Spacing</h3>
+            <div class="arrow-cnt" onclick="sp.value = parseInt(sp.value) - 1; sp.dispatchEvent(new Event('input'))"><div class="arrow left"></div></div>
+            <input type="range" id="letterSpacing" min="0" max="30" value="0" oninput="this.nextElementSibling.value = this.value">
+            <output>0</output>
+            <div class="arrow-cnt" onclick="sp.value = parseInt(sp.value) + 1; sp.dispatchEvent(new Event('input'))"><div class="arrow right"></div></div>
         </div>
         <div>
-            <button onclick="getAccel()">Turn ON</button>
+            <button onclick="getAccel()">Accelerometer ON</button>
         </div>
     </div>
+    <div id="control-hide" onclick="let c = document.getElementById('control'); c.style.display = c.style.display === 'none' ? 'grid' : 'none'; this.style.top = c.style.display === 'none' ? '0.5vw' : '8vw'; this.firstElementChild.classList.toggle('up'); this.firstElementChild.classList.toggle('down');"><div class="arrow up"></div></div>
     <div id="container" contenteditable="true">
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta ut quos eaque sapiente praesentium officia, rerum sequi nam, nemo omnis explicabo nesciunt earum atque ex, quidem itaque recusandae a maxime! Repellat alias illo ut! Optio sint, ad, voluptates vero veniam dolores ex architecto perspiciatis enim illum eius ut quo quae accusamus a similique quos aspernatur omnis obcaecati. Pariatur magnam atque fuga doloribus aspernatur quas. Voluptatem adipisci temporibus accusantium iusto, officia blanditiis officiis ipsam quis aperiam atque aspernatur nobis recusandae autem. Quis est ipsa totam maiores, perferendis repellat tempora deleniti magni cupiditate commodi porro veritatis odio quibusdam repellendus hic perspiciatis autem natus. Non commodi minima voluptatibus, laborum nostrum accusamus et animi rerum ducimus dolor repellendus iure nemo qui deserunt optio mollitia temporibus iste. Tenetur ipsum labore nisi magnam, quisquam soluta. Ipsum nostrum beatae voluptas incidunt alias praesentium libero iste facere, quae dolorum nisi consequuntur quo sint totam dolor et, inventore quibusdam! Hic voluptatum repudiandae optio aut sequi quis odit temporibus suscipit dolorum labore sed necessitatibus laborum officia perspiciatis omnis placeat beatae, molestiae numquam quod totam iure, natus ea ratione. Similique hic, delectus illo molestiae ea dignissimos veniam ducimus obcaecati fugiat rem quidem quae, magni assumenda dolores accusantium itaque laboriosam dolorum eum praesentium. Ratione eaque iusto dolores laboriosam, tenetur ex veniam numquam eveniet soluta quaerat ipsa, magni asperiores aperiam praesentium fugiat rerum consequuntur libero illum vero ad molestias corrupti repudiandae quae. Optio veniam minima consequuntur assumenda soluta quaerat sint nihil dolorem commodi laborum accusantium aliquid perferendis iste blanditiis nemo, unde nulla adipisci aperiam error excepturi! Repellendus qui esse nobis voluptas cupiditate ab quo obcaecati soluta suscipit numquam? Ipsa itaque neque, minima tempore, dolor impedit obcaecati animi veritatis ad, atque ex in beatae? Ipsam asperiores quidem consequatur aliquid hic molestiae necessitatibus sint minima fugit, exercitationem dolorem, atque eum quos cupiditate repudiandae repellendus ea earum quasi sed alias unde magni nobis odio? Sint sunt tempore explicabo fuga a, similique ipsam dolore magnam esse alias laborum voluptate autem impedit laboriosam vitae magni rem saepe porro asperiores? Provident quidem exercitationem, distinctio unde obcaecati nulla debitis fuga culpa repellendus sunt ea dignissimos dolor placeat molestias? Placeat non necessitatibus ad qui? Cupiditate id veritatis praesentium exercitationem expedita blanditiis. Eum neque voluptatum quos culpa porro obcaecati nisi explicabo officia est beatae. Facilis velit dolor amet rem porro ullam nobis, molestiae voluptates similique illum incidunt autem blanditiis? Cupiditate inventore obcaecati incidunt dolorum a. Reprehenderit reiciendis nemo a molestiae amet labore quidem exercitationem repellendus voluptatem similique et harum soluta laudantium dolores sed sit omnis, quisquam fugit laborum voluptas? Itaque veritatis iure pariatur ullam, totam porro accusantium facilis velit dignissimos, consequatur alias ab repudiandae excepturi doloribus laborum aliquid, nam qui accusamus ipsum. Beatae optio autem reiciendis. Neque pariatur quos ab numquam placeat aperiam accusantium cum, error doloremque sapiente! Quae sit rerum hic magni nisi rem voluptate repellat ipsa odio delectus, amet facere neque dolorem eaque maxime corrupti nulla totam debitis earum tempora, praesentium numquam officiis harum voluptas! Autem recusandae ipsa nihil natus quos quis est repellendus illum doloribus vero voluptatibus blanditiis, sunt eum ipsum commodi beatae nam soluta incidunt fuga. Officiis similique repudiandae ab nesciunt iure cumque ea cupiditate qui aut eius recusandae modi a, quae velit ut culpa! Veniam, et voluptates tempore at quas aut architecto amet minima iure, corrupti modi nihil magni vel magnam. Soluta dignissimos, enim dicta assumenda excepturi aliquam tempore tempora, accusantium officiis ipsum doloribus, nostrum beatae repellat vel quisquam odio aperiam necessitatibus sit! Magnam voluptates provident odio ratione, vel repudiandae delectus inventore at, corporis esse cupiditate? Saepe ratione necessitatibus adipisci harum nostrum delectus laborum ipsam officia possimus eligendi architecto, natus maxime totam! Soluta tempora, saepe cupiditate, natus impedit temporibus harum quasi nobis et esse error quod nihil at sint animi expedita odit eligendi voluptatibus amet. Ex nemo animi assumenda debitis distinctio atque delectus rerum quae quis, exercitationem est impedit rem odio sit, vero nisi ipsum ipsam, doloremque deserunt porro! Dolores hic ullam est voluptate officia. Doloremque velit, aliquam similique dolorem laboriosam sunt nisi? Asperiores vitae facilis esse beatae alias magni doloremque harum accusantium numquam quis, sunt aspernatur quae aut? Deleniti reprehenderit, veritatis asperiores eos cupiditate fugiat sint ad saepe ullam nisi voluptas accusantium sed nihil consequuntur eligendi blanditiis quaerat perspiciatis eaque vero rerum aperiam libero quia recusandae esse. Facilis illo aliquam, corrupti beatae quis, dolorum eaque blanditiis tenetur dicta temporibus veritatis unde vero ullam, delectus deserunt fugiat eligendi quos cum ad maiores ut quaerat veniam voluptas! Numquam vel amet est possimus minus? Distinctio culpa fugit suscipit, modi animi excepturi earum odit dolores maxime laudantium doloribus voluptatum quas, quos unde. Libero, hic neque. Corrupti dignissimos, iste neque expedita possimus libero id numquam odio rerum eos odit aliquid nostrum vitae laudantium animi consequuntur autem? Ducimus earum eos asperiores tenetur suscipit. Fugit distinctio earum ratione maxime ullam ea? Eum commodi ipsum, dolore iure dolores ea rem placeat ad repellendus similique non magnam dolorum obcaecati sunt quae deserunt. Iusto ducimus temporibus quos ipsam.
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam laboriosam quam ad neque totam beatae nisi nemo maiores aperiam! Soluta veritatis qui quibusdam nam amet tenetur sint natus libero voluptatem.
