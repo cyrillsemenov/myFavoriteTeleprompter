@@ -10,15 +10,6 @@ const server = app.use(express.static(path.join(__dirname, "pub")))
 
 const io = socketIO(server);
 
-// const express = require("express");
-// const app = express();
-// const path = require("path");
-// const http = require("http").createServer(app);
-// const io = require("socket.io")(http);
-// const port = process.env.PORT || 3000;
-
-// app.use(express.static(path.join(__dirname, "pub")))
-
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, INDEX));
 });
@@ -27,18 +18,23 @@ app.get("/:room", (req, res) => {
     res.sendFile(path.join(__dirname, INDEX));
 });
 
-io.on("connection", (socket) => {
+var rooms = {};
 
+io.on("connection", (socket) => {
     socket.on("join", (id) => {
         socket.room = id;
         socket.join(id);
-        socket.to(id).emit("joined", id);
+        Object.keys(rooms[id]).forEach((key,index) => {
+            socket.emit("sync", key, rooms[id][key])
+        });
     });
 
+    // socket.on('disconnect', () => {});
+
     socket.on("sync", (command, value) => {
-        // console.log("MESSAGEFROM", socket.id);
         // console.log(socket.id, ">>>", command, value);
         socket.to(socket.room).emit("sync", command, value);
+        rooms[socket.room][command] = value;
     });
 
     socket.on("print", value => {
@@ -46,15 +42,30 @@ io.on("connection", (socket) => {
     });
 });
 
-// http.listen(port, () => {
-//     console.log("Server listening at port %d", port);
-// });
+io.of("/").adapter.on("create-room", (room) => {
+    console.log("New room", room, "was created.", Object.keys(rooms).length, "rooms totally");
+});
+  
+io.of("/").adapter.on("join-room", (room, id) => {
+    if (!rooms[room]) {
+        rooms[room] = {};
+    };
+    let clients = io.sockets.adapter.rooms.get(room);
+    let numClients = clients ? clients.size : 0;
+    console.log("Socket", id, "has joined room", room+". It has", numClients, "clients");
+});
 
-// http.on('clientError', (err, socket) => {
-//     console.error(err);
-//     socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-//   });
+io.of("/").adapter.on("delete-room", (room) => {
+    delete rooms[room];
+    console.log("Room", room, "was deleted");
+});
+  
+io.of("/").adapter.on("leave-room", (room, id) => {
+    console.log("Socket", id, "has leaved room", room);
+});
 
+
+// Delete this?
 const throttle = (func, limit = process.env.LIMIT || 30) => {
     let inThrottle
     return function() {
