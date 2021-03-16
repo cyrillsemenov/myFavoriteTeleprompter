@@ -1,27 +1,16 @@
 const socket = io("/", {'force new connection': false});
-const h = document.getElementById("container");
-const url = "https://mfpromptr.herokuapp.com/";
-var axis;
-// var block = false;
-var block = true;
+// socketStatusEvents();
+const $container = document.getElementById("container");
+var axis, block = true;
 setTimeout(() => {block = false}, 1000);
+$(document).on("gesturestart", (e) => { e.preventDefault();});
+$(document).on("touchmove", (e) => {e.preventDefault();});
 
 window.onload = () => {
-    $(document).on("gesturestart", (e) => { e.preventDefault();});
-    $(document).on("touchmove", (e) => {e.preventDefault();});
     socketConnect();
 
-    $(window).on("orientationchange", () => {
-        // https://stackoverflow.com/questions/6448465/jquery-mobile-device-scaling/
-        if (window.orientation == 90 || window.orientation == -90 || window.orientation == 270) {
-            axis = "gamma";
-        } else {
-            axis = "beta";
-        }
-    }).trigger('orientationchange');
-    
     // Handle events on container
-    $("#container").on("scroll", (e) => {
+    $($container).on("scroll", (e) => {
         let scrl = getScroll();
         // Show progress in bar
         $("#bar").css("width", scrl*100 + "%");
@@ -57,7 +46,6 @@ window.onload = () => {
                 break;
         };
     }).each(function() {
-        console.log(this.value )
         this.nextElementSibling.value = this.value > 9 ? this.value : '0' + this.value;
     });
 
@@ -78,31 +66,43 @@ window.onload = () => {
         delay = 300;
     });
 
+    // Resize bar =====
+    $("body").on("mousedown ontouchstart", (event) => {
+        if (event.originalEvent.offsetY > document.body.offsetHeight) {
+            $($container).addClass("noselect").attr("contenteditable", "false");
+            $(document).on("mousemove ontouchmove", (e) => {
+                let padding = parseInt($("#container").css("padding-top"));
+                let newHeight = (100 * (e.originalEvent.clientY - padding)) / window.innerWidth;
+                socket.emit("sync", "height", newHeight);
+                $("#container").css("height", newHeight+"vw")
+            }).on("mouseup ontouchend", () => {
+                $(document).off("mousemove").attr("contenteditable", "true");
+                $($container).removeClass("noselect");
+            })
+        };
+    })
+
+    $("#flip").on("click", () => {
+        $('#container').toggleClass('flip');
+    })
+
+    $("#control").on("click", function(e) {
+        if (e.originalEvent.offsetY > this.offsetHeight - vw()) {
+            console.log(e.originalEvent.offsetY, this.offsetHeight);
+            $(this).children().toggle();
+            $(this).toggleClass("hidden");
+        }
+    })
 };
 
-async function socketConnect() {
-    uuid = window.location.pathname;
+function socketConnect() {
+    const url = window.location.protocol+"//"+window.location.host;
+    const uuid = window.location.pathname;
     const room = uuid == "/" ? randomString(6) : uuid.slice(1);
     var blocker; // timeout for events
 
-    // socket.on("connect", () => {
-    // });
-
-    // console.log("room", room);
     socket.emit("join", room);
-    
-    $("#qr").html('<img src="https://chart.googleapis.com/chart?cht=qr&chs=120x120&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/>')
-        .on("click", () => {
-            $("#big-qr-container").html('<div id="big-qr"><img src="https://chart.googleapis.com/chart?cht=qr&chs=512x512&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/></div><input readonly type="text" value="' + url + room + '" id="link"><button onclick=\'let link = document.getElementById("link");link.select();link.setSelectionRange(0, 99999); document.execCommand("copy");\'><i class="fas fa-copy"></i></button>')
-                .show();
-            $("#big-qr").on("click", function () {$("#big-qr-container").hide()});
-        });
-    
-
-    socket.on("joined", (id) => {
-        // socket.emit("print", id);
-        console.log("joined", id);
-    })
+    createQR(url+room);
 
     function preventEvent() {
         blocker = setTimeout(() => {
@@ -118,10 +118,13 @@ async function socketConnect() {
         console.log("INPUT >>>", command, value);
         switch (command) {
             case "scroll":
-                    document.getElementById("container").scrollTop = setScroll(value);
+                $container.scrollTop = setScroll(value);
                 break;
             case "input":
-                $("#container").html(value);
+                $($container).html(value);
+                break;
+            case "height":
+                $($container).css("height", value+"vw");
                 break;
             case "size":
             case "margin":
@@ -137,11 +140,11 @@ async function socketConnect() {
 
 
 function getScroll() {
-    return h.scrollTop / h.scrollHeight
+    return $container.scrollTop / $container.scrollHeight
 }
 
 function setScroll(value) {
-    return h.scrollHeight * value;
+    return $container.scrollHeight * value;
 }
 
 const throttle = (func, limit = 100) => {
@@ -173,7 +176,7 @@ function getAccel(){
         .then(permissionState => {
             if (permissionState === 'granted') {
                 window.addEventListener('deviceorientation', (event) => {
-                    h.scrollBy(0,Math.round(Math.pow(event[axis]/10,3)));
+                    $container.scrollBy(0,Math.round(Math.pow(event[axis]/10,3)));
                 });
             }
         }).catch(console.error);
@@ -192,3 +195,36 @@ function getAccel(){
     //     }
     //   }
 }
+
+function vw() {
+    return Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0) / 100
+}
+
+function socketStatusEvents() {
+    socket.on("connect", () => {
+    });
+    socket.on("connect_error", (error) => {
+    });
+    socket.on("disconnect", () => {
+    });
+    socket.on("joined", (id) => {
+    })
+}
+
+function createQR(url) {
+    $("#qr").html('<img src="https://chart.googleapis.com/chart?cht=qr&chs=120x120&chld=L|0&chl=' + url + '&choe=UTF-8" alt=""/>')
+    .on("click", () => {
+        $("#big-qr-container").html('<div id="big-qr"><img src="https://chart.googleapis.com/chart?cht=qr&chs=512x512&chld=L|0&chl=' + url + '&choe=UTF-8" alt=""/></div><input readonly type="text" value="' + url + room + '" id="link"><button onclick=\'let link = document.getElementById("link");link.select();link.setSelectionRange(0, 99999); document.execCommand("copy");\'><i class="fas fa-copy"></i></button>')
+            .show();
+        $("#big-qr").on("click", function () {$("#big-qr-container").hide()});
+    });
+}
+
+$(window).on("orientationchange", () => {
+    // https://stackoverflow.com/questions/6448465/jquery-mobile-device-scaling/
+    if (window.orientation == 90 || window.orientation == -90 || window.orientation == 270) {
+        axis = "gamma";
+    } else {
+        axis = "beta";
+    }
+}).trigger('orientationchange');

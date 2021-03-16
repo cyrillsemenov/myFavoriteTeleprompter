@@ -55,6 +55,16 @@ body {
     max-height: -webkit-fill-available;
 }
 
+body:after {
+    content: " ";
+    background-color: #ffffff55;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 0.5vw;
+    cursor: row-resize;
+}
+
 #container {
     position: relative;
     text-rendering: optimizeLegibility;
@@ -62,6 +72,8 @@ body {
     overflow-y: scroll;
     overflow-x: hidden;
     top: 0vw;
+    max-height: 100vh;
+    min-height: 3vh;
     height: 50vw;
     z-index: -1;
     /* -webkit-font-feature-settings: "kern" 1; */
@@ -73,13 +85,13 @@ body {
     padding-top: 9vw;
     color: #fff;
     font-family: "JetBrains-Bold";
-    /* -ms-overflow-style: none;
-    scrollbar-width: none;  Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none; 
 }
 
-/* #container::-webkit-scrollbar {
+#container::-webkit-scrollbar {
     display: none;
-  } */
+}
 
 [contenteditable] {
     outline: 0px solid transparent;
@@ -87,14 +99,9 @@ body {
 
 #control {
     display: grid;
-    /* align-content: center; */
-    /* justify-content: space-between; */
-    /* align-items: center; */
-    /* justify-items: stretch; */
     grid-template-columns: 8vw repeat(4, 1fr) 2vw 2vw;
-    grid-template-rows: 6.7vw;
+    grid-template-rows: 8vw;
     width: 100vw;
-    max-height: 6.7vw;
     overflow: visible;
     position: fixed;
     top: 0.5vw;
@@ -104,6 +111,33 @@ body {
     color: #fff;
     font-family: "JetBrains-Regular";
     font-size: 2vw;
+    transition: all .2s ease-in-out;
+}
+
+#control:after {
+    content: "\f0d8";
+    font-family: FontAwesome;
+    background-color: #ffffff25;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1vw;
+    line-height: 50%;
+    cursor: n-resize;
+    text-align: center;
+    align-self: end;
+}
+
+#control.hidden {
+    max-height: 1vw;
+}
+
+#control.hidden:after {
+    content: "\f0d7";
+    max-height: 1vw;
+    background-color: #000;
+    color: #ffffff55;
+    cursor: s-resize;
 }
 
 .control-elem {
@@ -201,9 +235,8 @@ body {
     -khtml-user-select:     none;
     -moz-user-select:       none;
     -ms-user-select:        none; 
-    user-select:            none;
-                                 
-  }
+    user-select:            none;                         
+}
 
 /* Progress bar */
 .progress-container {
@@ -265,8 +298,8 @@ body {
     border-radius: 50%;
     display: block;
     position: absolute;
-    top: 97%;
-    left: 3%;
+    bottom: 5vw;
+    left: 5vw;
     transition: all .1s ease-in-out;
   }
 
@@ -278,7 +311,7 @@ body {
     border-radius: 10%;
     display: block;
     position: absolute;
-    top: 90%;
-    left: 90%;
+    right: 5vw;
+    bottom: 5vw;
     transition: all .1s ease-in-out;
   }
