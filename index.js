@@ -11,7 +11,8 @@ const server = app.use(express.static(path.join(__dirname, "pub")))
 const io = socketIO(server);
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, INDEX));
+    // res.sendFile(path.join(__dirname, INDEX));
+    res.redirect("/"+randomString);
 });
 
 app.get("/:room", (req, res) => {
@@ -22,8 +23,12 @@ var rooms = {};
 
 io.on("connection", (socket) => {
     socket.on("join", (id) => {
+        if (!rooms[id]) {
+            rooms[id] = {};
+        };
         socket.room = id;
         socket.join(id);
+        console.log("JOIN", id);
         Object.keys(rooms[id]).forEach((key,index) => {
             socket.emit("sync", key, rooms[id][key])
         });
@@ -34,7 +39,12 @@ io.on("connection", (socket) => {
     socket.on("sync", (command, value) => {
         // console.log(socket.id, ">>>", command, value);
         socket.to(socket.room).emit("sync", command, value);
-        rooms[socket.room][command] = value;
+        try {
+            rooms[socket.room][command] = value;
+        } catch (error) {
+            console.error(error)
+        }
+        
     });
 
     socket.on("print", value => {
@@ -47,9 +57,9 @@ io.of("/").adapter.on("create-room", (room) => {
 });
   
 io.of("/").adapter.on("join-room", (room, id) => {
-    if (!rooms[room]) {
-        rooms[room] = {};
-    };
+    // if (!rooms[room]) {
+    //     rooms[room] = {};
+    // };
     let clients = io.sockets.adapter.rooms.get(room);
     let numClients = clients ? clients.size : 0;
     console.log("Socket", id, "has joined room", room+". It has", numClients, "clients");
@@ -78,3 +88,15 @@ const throttle = (func, limit = process.env.LIMIT || 30) => {
       }
     }
   }
+
+  function randomString(stringLength = 6) {
+    let chars = "0123456789abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
+    let randomString = "";
+    for (let i=0; i<stringLength; i++) {
+        let rNum = Math.floor(Math.random() * chars.length);
+        randomString += chars.substring(rNum,rNum+1);
+    }
+    return randomString
+}
+
+

@@ -2,11 +2,9 @@ const socket = io("/");
 const h = document.getElementById("container");
 const url = "https://mfpromptr.herokuapp.com/";
 var axis;
-var block = false;
-const s = document.getElementById('size');
-const m = document.getElementById('margin');
-const lh = document.getElementById('lineHeight');
-const sp = document.getElementById('letterSpacing');
+// var block = false;
+var block = true;
+setTimeout(() => {block = false}, 1000);
 
 window.onload = () => {
     $(document).on("gesturestart", (e) => { e.preventDefault();});
@@ -16,40 +14,31 @@ window.onload = () => {
     $(window).on("orientationchange", () => {
         // https://stackoverflow.com/questions/6448465/jquery-mobile-device-scaling/
         if (window.orientation == 90 || window.orientation == -90 || window.orientation == 270) {
-            // if orientation is landscape read gamma from accelerometer
             axis = "gamma";
         } else {
-            // otherwise read beta
             axis = "beta";
         }
-    //trigger an orientationchange event on the window object to initialize this code (basically in-case the user opens the page in landscape mode)
     }).trigger('orientationchange');
     
     // Handle events on container
     $("#container").on("scroll", (e) => {
         let scrl = getScroll();
+        // Show progress in bar
         $("#bar").css("width", scrl*100 + "%");
         if (!block) {
             console.log("OUTPUT <<<", "scroll", scrl);
             socket.emit("sync", "scroll", scrl);
         };
-    });
-
-    $("#container").on("input", e => {
+    }).on("input", (e) => {
         if (!block) {
             socket.emit("sync", "input", e.target.innerHTML);
         };
     });
-    // window.onscroll = e => {
-    //     $("#bar").css("width", getScroll()*100 + "%");
-    //     if (!block) {
-    //         console.log("OUTPUT <<<", "scroll", getScroll());
-    //         socket.emit("sync", "scroll", getScroll());
-    //     }
-    // };
 
+    // Handle text properties
     $("input[type=range]").on("input change", function() {
         console.log("OUTPUT <<<", this.id, $(this).val());
+        this.nextElementSibling.value = this.value > 9 ? this.value : '0' + this.value;
         if (!block) {
             socket.emit("sync", this.id, $(this).val());
         };
@@ -67,35 +56,66 @@ window.onload = () => {
                 $("#container").css("letter-spacing", $(this).val()/100 +"em");
                 break;
         };
+    }).each(function() {
+        console.log(this.value )
+        this.nextElementSibling.value = this.value > 9 ? this.value : '0' + this.value;
     });
+
+    // UI ==============
+    var changeArrow, delay = 300;
+    $(".arrow-cnt").on("mousedown", function (e) {
+        let $range = $(this).parent(".control-elem").children("input[type=range]");
+        if ($(this).children(":first").hasClass("right")) {
+            $range.val(parseInt($range.val()) + 1);
+        } if ($(this).children(":first").hasClass("left"))  {
+            $range.val(parseInt($range.val()) - 1);
+        };
+        $range.trigger('input');
+        changeArrow = setTimeout(() => {$(this).mousedown()}, delay);
+        delay -= delay > 50 ? delay/4 : 0;
+    }).on("mouseup mouseout", () => {
+        clearTimeout(changeArrow);
+        delay = 300;
+    });
+
 };
 
 function socketConnect() {
     uuid = window.location.pathname;
     const room = uuid == "/" ? randomString(6) : uuid.slice(1);
     var blocker; // timeout for events
-    
+    // socket.emit("print", "try "+room);
     socket.on("connect", () => {
         console.log("room", room);
         socket.emit("join", room);
-        $("#qr").html('<a href="' + url + room + '"><img src="https://chart.googleapis.com/chart?cht=qr&chs=120x120&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/></a>');
+        // socket.emit("print", "done "+room);
+        $("#qr").html('<img src="https://chart.googleapis.com/chart?cht=qr&chs=120x120&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/>')
+            .on("click", () => {
+                $("#big-qr-container").html('<div id="big-qr"><img src="https://chart.googleapis.com/chart?cht=qr&chs=512x512&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/></div><input readonly type="text" value="' + url + room + '" id="link"><button onclick=\'let link = document.getElementById("link");link.select();link.setSelectionRange(0, 99999); document.execCommand("copy");\'><i class="fas fa-copy"></i></button>')
+                    .show();
+                $("#big-qr").on("click", function () {$("#big-qr-container").hide()});
+            });
     });
 
     socket.on("joined", (id) => {
+        // socket.emit("print", id);
         console.log("joined", id);
     })
 
     function preventEvent() {
-        blocker = setTimeout(() => block = false, 300);
+        blocker = setTimeout(() => {
+            block = false;
+            $("#block-led").css("background-color", "#000");
+        }, 300);
     }
 
     socket.on("sync", (command, value) => {
         clearTimeout(blocker);
         block = true;
+        $("#block-led").css("background-color", "#ff604675");
         console.log("INPUT >>>", command, value);
         switch (command) {
             case "scroll":
-                    // window.scroll(0, setScroll(value));
                     document.getElementById("container").scrollTop = setScroll(value);
                 break;
             case "input":
