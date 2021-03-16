@@ -1,4 +1,4 @@
-const socket = io("/");
+const socket = io("/", {'force new connection': false});
 const h = document.getElementById("container");
 const url = "https://mfpromptr.herokuapp.com/";
 var axis;
@@ -80,22 +80,24 @@ window.onload = () => {
 
 };
 
-function socketConnect() {
+async function socketConnect() {
     uuid = window.location.pathname;
     const room = uuid == "/" ? randomString(6) : uuid.slice(1);
     var blocker; // timeout for events
-    // socket.emit("print", "try "+room);
-    socket.on("connect", () => {
-        console.log("room", room);
-        socket.emit("join", room);
-        // socket.emit("print", "done "+room);
-        $("#qr").html('<img src="https://chart.googleapis.com/chart?cht=qr&chs=120x120&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/>')
-            .on("click", () => {
-                $("#big-qr-container").html('<div id="big-qr"><img src="https://chart.googleapis.com/chart?cht=qr&chs=512x512&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/></div><input readonly type="text" value="' + url + room + '" id="link"><button onclick=\'let link = document.getElementById("link");link.select();link.setSelectionRange(0, 99999); document.execCommand("copy");\'><i class="fas fa-copy"></i></button>')
-                    .show();
-                $("#big-qr").on("click", function () {$("#big-qr-container").hide()});
-            });
-    });
+
+    // socket.on("connect", () => {
+    // });
+
+    // console.log("room", room);
+    socket.emit("join", room);
+    
+    $("#qr").html('<img src="https://chart.googleapis.com/chart?cht=qr&chs=120x120&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/>')
+        .on("click", () => {
+            $("#big-qr-container").html('<div id="big-qr"><img src="https://chart.googleapis.com/chart?cht=qr&chs=512x512&chld=L|0&chl=' + url + room + '&choe=UTF-8" alt=""/></div><input readonly type="text" value="' + url + room + '" id="link"><button onclick=\'let link = document.getElementById("link");link.select();link.setSelectionRange(0, 99999); document.execCommand("copy");\'><i class="fas fa-copy"></i></button>')
+                .show();
+            $("#big-qr").on("click", function () {$("#big-qr-container").hide()});
+        });
+    
 
     socket.on("joined", (id) => {
         // socket.emit("print", id);

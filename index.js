@@ -11,8 +11,8 @@ const server = app.use(express.static(path.join(__dirname, "pub")))
 const io = socketIO(server);
 
 app.get("/", (req, res) => {
-    // res.sendFile(path.join(__dirname, INDEX));
-    res.redirect("/"+randomString);
+    res.sendFile(path.join(__dirname, INDEX));
+    // res.redirect("/"+randomString);
 });
 
 app.get("/:room", (req, res) => {
@@ -21,14 +21,19 @@ app.get("/:room", (req, res) => {
 
 var rooms = {};
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
     socket.on("join", (id) => {
         if (!rooms[id]) {
             rooms[id] = {};
         };
         socket.room = id;
         socket.join(id);
-        console.log("JOIN", id);
+        // io.to(id).emit("joined", "new one");
+        // console.log("JOIN", id);
+        let clients = io.sockets.adapter.rooms.get(id);
+        let numClients = clients ? clients.size : 0;
+        console.log("Socket", id, "has joined room", id+". It has", numClients, "clients");
+    
         Object.keys(rooms[id]).forEach((key,index) => {
             socket.emit("sync", key, rooms[id][key])
         });
@@ -60,9 +65,9 @@ io.of("/").adapter.on("join-room", (room, id) => {
     // if (!rooms[room]) {
     //     rooms[room] = {};
     // };
-    let clients = io.sockets.adapter.rooms.get(room);
-    let numClients = clients ? clients.size : 0;
-    console.log("Socket", id, "has joined room", room+". It has", numClients, "clients");
+    // let clients = io.sockets.adapter.rooms.get(room);
+    // let numClients = clients ? clients.size : 0;
+    // console.log("Socket", id, "has joined room", room+". It has", numClients, "clients");
 });
 
 io.of("/").adapter.on("delete-room", (room) => {
