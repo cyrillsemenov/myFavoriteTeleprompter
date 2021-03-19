@@ -96,7 +96,7 @@ window.onload = () => {
 };
 
 function socketConnect() {
-    const url = window.location.protocol+"//"+window.location.host;
+    const url = window.location.protocol+"//"+window.location.host+"/";
     const uuid = window.location.pathname;
     const room = uuid == "/" ? randomString(6) : uuid.slice(1);
     var blocker; // timeout for events
