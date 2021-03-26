@@ -66,6 +66,10 @@ body:after {
 }
 
 #container {
+    /* -webkit-user-modify: read-write;
+    overflow-wrap: break-word;
+    -webkit-line-break: after-white-space; */
+
     position: relative;
     text-rendering: optimizeLegibility;
     font-size: 10vw;
@@ -87,6 +91,11 @@ body:after {
     font-family: "JetBrains-Bold";
     -ms-overflow-style: none;
     scrollbar-width: none; 
+}
+
+#container:after {
+    content: "\00000a\00000a\00000a\00000a\00000a\00000a";
+    white-space: pre-wrap;
 }
 
 #container::-webkit-scrollbar {

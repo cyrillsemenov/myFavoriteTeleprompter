@@ -8,7 +8,8 @@ $(document).on("touchmove", (e) => {e.preventDefault();});
 
 window.onload = () => {
     socketConnect();
-
+    screenLock();
+    // $($container).chromeinsertfix();
     // Handle events on container
     $($container).on("scroll", (e) => {
         let scrl = getScroll();
@@ -67,23 +68,29 @@ window.onload = () => {
     });
 
     // Resize bar =====
-    $("body").on("mousedown ontouchstart", (event) => {
+    $(document.body).on("mousedown", (event) => {
         if (event.originalEvent.offsetY > document.body.offsetHeight) {
+
             $($container).addClass("noselect").attr("contenteditable", "false");
-            $(document).on("mousemove ontouchmove", (e) => {
+            $(document).on("mousemove", (e) => {
+
                 let padding = parseInt($("#container").css("padding-top"));
                 let newHeight = (100 * (e.originalEvent.clientY - padding)) / window.innerWidth;
                 socket.emit("sync", "height", newHeight);
                 $("#container").css("height", newHeight+"vw")
-            }).on("mouseup ontouchend", () => {
-                $(document).off("mousemove").attr("contenteditable", "true");
-                $($container).removeClass("noselect");
+            }).on("mouseup", () => {
+
+                $(document).off("mousemove");
+                $($container).removeClass("noselect").attr("contenteditable", "true");
             })
         };
     })
 
     $("#flip").on("click", () => {
         $('#container').toggleClass('flip');
+        if (screenfull.isEnabled) {
+            screenfull.request();
+        }
     })
 
     $("#control").on("click", function(e) {
@@ -214,10 +221,27 @@ function socketStatusEvents() {
 function createQR(url) {
     $("#qr").html('<img src="https://chart.googleapis.com/chart?cht=qr&chs=120x120&chld=L|0&chl=' + url + '&choe=UTF-8" alt=""/>')
     .on("click", () => {
-        $("#big-qr-container").html('<div id="big-qr"><img src="https://chart.googleapis.com/chart?cht=qr&chs=512x512&chld=L|0&chl=' + url + '&choe=UTF-8" alt=""/></div><input readonly type="text" value="' + url + room + '" id="link"><button onclick=\'let link = document.getElementById("link");link.select();link.setSelectionRange(0, 99999); document.execCommand("copy");\'><i class="fas fa-copy"></i></button>')
+        $("#big-qr-container").html('<div id="big-qr"><img src="https://chart.googleapis.com/chart?cht=qr&chs=512x512&chld=L|0&chl=' + url + '&choe=UTF-8" alt=""/></div><input readonly type="text" value="' + url + '" id="link"><button onclick=\'let link = document.getElementById("link");link.select();link.setSelectionRange(0, 99999); document.execCommand("copy");\'><i class="fas fa-copy"></i></button>')
             .show();
         $("#big-qr").on("click", function () {$("#big-qr-container").hide()});
     });
+}
+
+async function screenLock() {
+    
+    // Create a reference for the Wake Lock.
+    let wakeLock = null;
+
+    // create an async function to request a wake lock
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        // $($container).html("Wake Lock is active!");
+        console.log('Wake Lock is active!');
+    } catch (err) {
+        // The Wake Lock request has failed - usually system related, such as battery.
+        console.log(`${err.name}, ${err.message}`);
+        // console.log(err);
+    }
 }
 
 $(window).on("orientationchange", () => {
@@ -228,3 +252,109 @@ $(window).on("orientationchange", () => {
         axis = "beta";
     }
 }).trigger('orientationchange');
+
+// $(document).on("DOMNodeInserted", $.proxy(function (e) {
+//     if (e.target.parentNode.getAttribute("contenteditable") === "true") {
+//         var newTextNode = document.createTextNode("");
+//         function antiChrome(node) {
+//             if (node.nodeType == 3) {
+//                 newTextNode.nodeValue += node.nodeValue.replace(/(\r\n|\n|\r)/gm, "<br>")
+//             }
+//             else if (node.nodeType == 1 && node.childNodes) {
+//                     for (var i = 0; i < node.childNodes.length; ++i) {
+//                         antiChrome(node.childNodes[i]);
+//                     }
+//             }
+//         }
+//         antiChrome(e.target);
+
+//         e.target.parentNode.replaceChild(newTextNode, e.target);
+//     }
+// }, this));
+// Select the node that will be observed for mutations
+// const targetNode = document.getElementById('container');
+
+// // Options for the observer (which mutations to observe)
+// const config = { 
+//     attributes: true, 
+//     childList: true, 
+//     subtree: true,
+//     attributeOldValue: true,
+//     characterDataOldValue: true
+// };
+
+// // Callback function to execute when mutations are observed
+// const callback = function(mutationList, observer) {
+//     mutationList.forEach( (mutation) => {
+//         switch (mutation.type) {
+//             case "childList":
+
+//                 break;
+
+//             case "characterData":
+            
+//                 break;
+
+//             case "attributes":
+//                 console.log(mutation.target[mutation.attributeName]);
+//                 if (mutation.target === targetNode) {
+//                     console.log("container was changed");
+//                 } else {
+//                     console.log("child was changed");
+//                     // mutation.target[mutation.attributeName] = ""
+//                 }
+//                 break;
+        
+//             default:
+//                 break;
+//         }
+//     });
+//     console.log(mutationList);
+// };
+
+// // Create an observer instance linked to the callback function
+// const observer = new MutationObserver(callback);
+// observer.observe(targetNode, config);
+
+$editables = $('[contenteditable=true]');
+
+$($editables).on('paste', (e) => {
+    e=e.originalEvent;
+    // Get user's pasted data
+    let data = e.clipboardData.getData('text/html') ||
+    e.clipboardData.getData('text/plain');
+
+    // Filter out everything except simple text and allowable HTML elements
+    let regex = /<(?!(\/\s*)?(p|div)[>,\s])([^>])*>/g;
+    data = data.replace(regex, '');
+
+    // Insert the filtered content
+    document.execCommand('insertHTML', false, data);
+
+    // Prevent the standard paste behavior
+    e.preventDefault();
+    $($editables).children().each(function () {$(this).attr("style", "")});
+});
+
+// $editables.filter("p,span").on('keypress',function(e){
+//  if(e.keyCode==13){ //enter && shift
+
+//   e.preventDefault(); //Prevent default browser behavior
+//   if (window.getSelection) {
+//       var selection = window.getSelection(),
+//           range = selection.getRangeAt(0),
+//           br = document.createElement("br"),
+//           textNode = document.createTextNode("\u00a0"); //Passing " " directly will not end up being shown correctly
+//       range.deleteContents();//required or not?
+//       range.insertNode(br);
+//       range.collapse(false);
+//       range.insertNode(textNode);
+//       range.selectNodeContents(textNode);
+
+//       selection.removeAllRanges();
+//       selection.addRange(range);
+//       return false;
+//   }
+
+//    }
+// });

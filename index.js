@@ -1,3 +1,7 @@
+require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+    console.log('addr: ' + add);
+  });
+
 const path = require("path");
 const express = require('express');
 const socketIO = require('socket.io');
@@ -5,18 +9,24 @@ const PORT = process.env.PORT || 3000;
 const INDEX = 'pub/index.html';
 
 const app = express();
-const server = app.use(express.static(path.join(__dirname, "pub")))
-  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+const router = express.Router()
+
+const options = {
+    index: false,
+    redirect: false,
+}
+
+const server = app.use("/static", express.static(path.join(__dirname, "pub/static"), options))
+    .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const io = socketIO(server);
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, INDEX));
-    // res.redirect("/"+randomString);
+    res.redirect("/"+randomString());
 });
 
 app.get("/:room", (req, res) => {
-    res.sendFile(path.join(__dirname, INDEX));
+        res.sendFile(path.join(__dirname, INDEX));
 });
 
 var rooms = {};

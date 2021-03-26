@@ -1,4 +1,5 @@
 /.DS_Store
+/pub/.DS_Store
 /cert.pem
 /key.pem
 /node_modules
