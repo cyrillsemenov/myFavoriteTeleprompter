@@ -339,34 +339,61 @@ $editables.on('paste', (e) => {
     $($editables).children().each(function () {$(this).attr("style", "")});
 });
 
-$editables.on("keydown", function (e) {
-    switch (e.keyCode) {
-        case 13:
-            e.preventDefault(); //Prevent default browser behavior
-            if (window.getSelection) {
-                var selection = window.getSelection(),
-                    range = selection.getRangeAt(0),
-                    br = document.createElement("br"),
-                    textNode = document.createTextNode("\u00a0"); //Passing " " directly will not end up being shown correctly
-                range.deleteContents();//required or not?
-                range.insertNode(br);
-                range.collapse(false);
-                // range.insertNode(textNode);
-                // range.selectNodeContents(textNode);
+$editables.on("keydown", (e) => {
+    try {
+        cleanup(e).then((r) => {
+            // console.log(r);
+            if (r) {
+                $editables.find("span[style]").contents().unwrap();
+            };
+        })
+    } catch {
+        return
+    }
 
-                selection.removeAllRanges();
-                selection.addRange(range);
-                // return false;
-            }
-            break;
-        case 46: // Delete
-        case 8: // Backspace
-            console.log("Delete pressed");
-            break;
-      };
-    //   clearChildrenStyles(this);
-      $editables.find("span[style]").contents().unwrap();
 });
+
+function cleanup (e) {
+    return new Promise((resolve, reject) => {
+        switch (e.keyCode) {
+            case 13:
+                e.preventDefault(); //Prevent default browser behavior
+                if (window.getSelection) {
+                    var selection = window.getSelection(),
+                        range = selection.getRangeAt(0),
+                        br = document.createElement("br"),
+                        textNode = document.createTextNode("\u00a0"); //Passing " " directly will not end up being shown correctly
+                    range.deleteContents();//required or not?
+                    range.insertNode(br);
+                    range.collapse(false);
+                    // range.insertNode(textNode);
+                    // range.selectNodeContents(textNode);
+    
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    // return false;
+                }
+                break;
+            case 46: // Delete
+            case 8: // Backspace
+            // PLEASE, GOD, ME THE POWER TO MAKE THIS ACT IN PROPER WAY
+            // IT WORKS, BUT IT SUCKS
+                // e.preventDefault();
+                // var selection = window.getSelection(),
+                //     range = selection.getRangeAt(0),
+                //     target = range.startContainer.parentNode.previousElementSibling.textContent,
+                //     source = range.startContainer;
+                
+                // target = target + " " + source.textContent;
+                // source.remove();
+                // console.log(selection, range);
+                break;
+            default: 
+                resolve(false);
+          };
+          resolve(true);
+    });
+}
 
 // (function( $ ){
 //     $.fn.clearChildrenStyles = function() {
