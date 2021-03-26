@@ -316,26 +316,76 @@ $(window).on("orientationchange", () => {
 // const observer = new MutationObserver(callback);
 // observer.observe(targetNode, config);
 
-$editables = $('[contenteditable=true]');
+// $editables = $('[contenteditable=true]');
+$editables = $('#container');
 
-$($editables).on('paste', (e) => {
-    e=e.originalEvent;
-    // Get user's pasted data
-    let data = e.clipboardData.getData('text/html') ||
-    e.clipboardData.getData('text/plain');
+$editables.on('paste', (e) => {
+    // https://stackoverflow.com/questions/53186433/restrict-paste-in-contenteditable-html-js
+    // Prevent the standard paste behavior
+    e.preventDefault();
+    
+    // Get clipboard data (obsolete way)
+    let data = e.originalEvent.clipboardData.getData('text/html') ||
+    e.originalEvent.clipboardData.getData('text/plain');
 
     // Filter out everything except simple text and allowable HTML elements
     let regex = /<(?!(\/\s*)?(p|div)[>,\s])([^>])*>/g;
     data = data.replace(regex, '');
 
-    // Insert the filtered content
+    // Insert the filtered content (obsolete way)
     document.execCommand('insertHTML', false, data);
 
-    // Prevent the standard paste behavior
-    e.preventDefault();
+    // Fcuk! There is still some syling? Let's get rid of them!!!
     $($editables).children().each(function () {$(this).attr("style", "")});
 });
 
+$editables.on("keydown", function (e) {
+    switch (e.keyCode) {
+        case 13:
+            e.preventDefault(); //Prevent default browser behavior
+            if (window.getSelection) {
+                var selection = window.getSelection(),
+                    range = selection.getRangeAt(0),
+                    br = document.createElement("br"),
+                    textNode = document.createTextNode("\u00a0"); //Passing " " directly will not end up being shown correctly
+                range.deleteContents();//required or not?
+                range.insertNode(br);
+                range.collapse(false);
+                // range.insertNode(textNode);
+                // range.selectNodeContents(textNode);
+
+                selection.removeAllRanges();
+                selection.addRange(range);
+                // return false;
+            }
+            break;
+        case 46: // Delete
+        case 8: // Backspace
+            console.log("Delete pressed");
+            break;
+      };
+    //   clearChildrenStyles(this);
+      $editables.find("span[style]").contents().unwrap();
+});
+
+// (function( $ ){
+//     $.fn.clearChildrenStyles = function() {
+//         console.log(this);
+//         if ( $(this).children().filter("p,span,div").length > 0 ) {
+//             $(this).children().each(clearChildrenStyles);
+//         } else {
+//             $(this).attr("style", "")
+//         }
+//     }; 
+//  })( jQuery );
+
+function clearChildrenStyles(jNode) {
+    if ( $(jNode).children().filter("p,span,div").length > 0 ) {
+        $(jNode).children().each(clearChildrenStyles);
+    } else {
+        $(jNode).attr("style", "")
+    }
+}
 // $editables.filter("p,span").on('keypress',function(e){
 //  if(e.keyCode==13){ //enter && shift
 
