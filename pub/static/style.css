@@ -89,6 +89,7 @@ body:after {
     padding-top: 9vw;
     color: #fff;
     font-family: "JetBrains-Bold";
+    text-align: center;
     -ms-overflow-style: none;
     scrollbar-width: none; 
 }

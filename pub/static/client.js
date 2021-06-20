@@ -361,8 +361,8 @@ function cleanup (e) {
                 if (window.getSelection) {
                     var selection = window.getSelection(),
                         range = selection.getRangeAt(0),
-                        br = document.createElement("br"),
-                        textNode = document.createTextNode("\u00a0"); //Passing " " directly will not end up being shown correctly
+                        br = document.createElement("br");
+                        // textNode = document.createTextNode("\u00a0"); //Passing " " directly will not end up being shown correctly
                     range.deleteContents();//required or not?
                     range.insertNode(br);
                     range.collapse(false);
